@@ -1,0 +1,32 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/">Grocery Store</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" routerLink="/"
+            [ngStyle]="{'color': router.url === '/' ? 'white' : ''}">Home</a></li>
+        <li class="nav-item" *ngIf="isLoggedIn">
+          <a class="nav-link" routerLink="/profile" [ngStyle]="{'color': router.url === '/profile' ? 'white' : ''}">My
+            Profile</a>
+        </li>
+        <li class="nav-item" *ngIf="isLoggedIn && (currentUser?.role == 'customer')">
+          <a class="nav-link" routerLink="/cart" [ngStyle]="{'color': router.url === '/cart' ? 'white' : ''}">
+            Cart <span class="badge bg-danger">{{ cartCount }}</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="currentUser?.role == 'admin'">
+          <a class="nav-link cursor-proint" routerLink="/product/add">Add Product</a>
+        </li>
+        <li class="nav-item" *ngIf="currentUser?.role == 'admin'">
+          <a class="nav-link cursor-proint" routerLink="/add-admin">Add Admin</a>
+        </li>
+        <li class="nav-item" *ngIf="isLoggedIn"><a class="nav-link cursor-proint" routerLink="/change-password">Change
+            Password</a>
+        </li>
+        <li class="nav-item" *ngIf="isLoggedIn"><a class="nav-link cursor-proint" (click)="logout()">Logout</a></li>
+        <li class="nav-item" *ngIf="!isLoggedIn"><a class="nav-link" routerLink="/login">Login</a></li>
+        <li class="nav-item" *ngIf="!isLoggedIn"><a class="nav-link" routerLink="/register">Register</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,27 @@
+<div class="container mt-4" style="min-height: calc(100vh - 180px)" *ngIf="user">
+  <h2 class="mb-3" >My Profile</h2>
+  <form>
+    <div class="mb-3">
+      <label class="form-label">Customer ID:</label>
+      <input type="text" class="form-control" name="customerId" [ngModel]="user.id" disabled>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Name:</label>
+      <input type="text" class="form-control" [(ngModel)]="user.name" name="name" [disabled]="!editing">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Email:</label>
+      <input type="email" class="form-control" name="email" [ngModel]="user.email" disabled>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Address:</label>
+      <textarea class="form-control" [(ngModel)]="user.address" name="address" [disabled]="!editing"></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Contact Number:</label>
+      <input type="text" class="form-control" [(ngModel)]="user.contact" name="contact" [disabled]="!editing">
+    </div>
+    <button type="button" class="btn btn-dark" *ngIf="!editing" (click)="enableEditing()">Edit</button>
+    <button type="button" class="btn btn-dark" *ngIf="editing" (click)="saveProfile()">Save</button>
+  </form>
+</div>

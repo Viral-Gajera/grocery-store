@@ -1,0 +1,110 @@
+.hero-bg {
+    background: url("/grocery.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    height: calc(70vh - 50px);
+}
+
+.hero-overlay {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & .container {
+        text-align: center;
+    }
+}
+
+#welcomeMessage {
+    color: white;
+    /* display: inline; */
+}
+
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin: 100px auto;
+}
+
+.loader {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #212529;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.card-hover {
+    transition: all 300ms;
+}
+
+.card-hover:hover {
+    transform: scale(1.05);
+}
+
+.search-title {
+    display: flex;
+    justify-content: space-between;
+
+    & .search-input-container {
+        width: 300px;
+        height: 40px;
+    }
+}
+
+.status-dot-success {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(40, 167, 69, 0.7);
+    margin-right: 5px;
+    outline: 3px solid rgba(40, 167, 69, 0.2);
+    animation-name: outline;
+    animation-duration: 1000ms;
+    animation-iteration-count: infinite;
+    /* animation-timing-function: linear; */
+    animation-direction: alternate;
+}
+
+.status-dot-danger {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(220, 53, 69, 0.7);
+    margin-right: 5px;
+    outline: 4px solid rgba(220, 53, 69, 0.2);
+    animation-name: outline;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    /* animation-timing-function: linear; */
+    animation-direction: alternate;
+}
+
+@keyframes outline {
+    0% {
+        outline-width: 4px;
+    }
+    100% {
+        outline-width: 0px;
+    }
+}

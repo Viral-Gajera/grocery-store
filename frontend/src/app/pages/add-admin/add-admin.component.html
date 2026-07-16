@@ -1,0 +1,46 @@
+<div class="container mt-4" style="min-height: calc(100vh - 180px) ;">
+    <div *ngIf="!registered" style="width: 100%;">
+        <h2 class="mb-3">Add Admin</h2>
+        <form (ngSubmit)="register()">
+            <div class="mb-3">
+                <label class="form-label">Name:</label>
+                <input type="text" class="form-control" [(ngModel)]="user.name" name="name" required maxlength="50">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email:</label>
+                <input type="email" class="form-control" [(ngModel)]="user.email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password:</label>
+                <input type="password" class="form-control" [(ngModel)]="user.password" name="password" required
+                    maxlength="30">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Address:</label>
+                <textarea class="form-control" [(ngModel)]="user.address" name="address" required
+                    maxlength="100"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Contact:</label>
+                <input type="text" class="form-control" [(ngModel)]="user.contact" name="contact" required
+                    maxlength="10">
+            </div>
+            <button type="submit" class="btn btn-dark">Add Admin</button>
+        </form>
+    </div>
+
+    <div class="card p-5 text-center" style="width: 100%; margin: 0 auto; max-width: 500px;" *ngIf="registered">
+        <h3>Admin Added Successfully!</h3>
+        <table class="detail-table">
+            <tr>
+                <td><strong>Name :</strong></td>
+                <td>{{ user.name }}</td>
+            </tr>
+            <tr>
+                <td><strong>Email :</strong></td>
+                <td>{{ user.email }}</td>
+            </tr>
+        </table>
+        <button class="btn btn-dark mt-3" (click)="goToHomePage()">Go to Home Page</button>
+    </div>
+</div>

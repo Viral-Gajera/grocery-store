@@ -1,0 +1,10 @@
+.flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .flex-container > * {
+    flex-grow: 1;
+  }

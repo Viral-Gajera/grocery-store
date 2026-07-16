@@ -1,0 +1,38 @@
+<div class="container mt-5 text-center">
+  <h2 class="text-dark">🎉 Transaction Successful! 🎉</h2>
+  <p>Your order has been placed successfully. Below is your invoice.</p>
+</div>
+
+<div class="container mt-4" id="invoice">
+  <h3>Invoice</h3>
+  <div class="card p-3">
+    <p><strong>Transaction ID:</strong> {{ transactionId || 'N/A' }}</p>
+    <p><strong>Customer ID:</strong> {{ user?.id || 'N/A' }}</p>
+    <p><strong>Products:</strong></p>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Price (₹)</th>
+          <th>Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of cartSummary | keyvalue">
+          <td>{{ item.value.name }}</td>
+          <td>₹{{ item.value.price }}</td>
+          <td>{{ item.value.quantity }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Total Product Price:</strong> ₹{{ total }}</p>
+    <p><strong>Discount:</strong> ₹{{ discount.toFixed(2) }} (10% Discount)</p>
+    <p><strong>GST Charges:</strong> ₹{{ gstCharges.toFixed(2) }} (18% - Before Discount)</p>
+    <p><strong>Delivery Charges:</strong> ₹{{ deliveryCharges }}</p>
+    <p><strong>Order Total:</strong> ₹{{ orderTotal }}</p>
+  </div>
+</div>
+
+<div class="container">
+  <button class="btn btn-dark mt-3" (click)="downloadInvoice()">Download Invoice</button>
+</div>

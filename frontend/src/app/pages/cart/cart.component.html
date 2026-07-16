@@ -1,0 +1,38 @@
+<div class="container empty-message mt-4" style="min-height: calc(100vh - 80px)" *ngIf="cart.length === 0">
+    <div class="text-center">
+      <h1 class="mb-4">Your Cart is Empty</h1>
+      <a class="btn btn-dark" routerLink="/" fragment="groceries-list">View Products</a>
+    </div>
+  </div>
+  
+  <div class="container mt-4" *ngIf="cart.length > 0" style="min-height: calc(100vh - 180px)" >
+    <div class="row">
+      <div class="col-12">
+        <h2>Summary</h2>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price (₹)</th>
+              <th>Quantity</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of cartSummary | keyvalue">
+              <td>{{ item.value.name }}</td>
+              <td>₹{{ item.value.price }}</td>
+              <td>
+                <button class="btn btn-sm btn-secondary" style="width: 30px;" (click)="updateQuantity(item.value.id!, -1)" [disabled]="!item.value.id" >-</button>
+                <div style="width: 30px; display: inline-block; text-align: center;">{{ item.value.quantity }}</div>
+                <button class="btn btn-sm btn-secondary" style="width: 30px;" (click)="updateQuantity(item.value.id!, 1)" [disabled]="!item.value.id">+</button>
+              </td>
+              <td><button class="btn btn-danger btn-sm" (click)="removeFromCart(item.value.id!)" [disabled]="!item.value.id">Remove</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <h5 class="mt-4 mb-4">Total: ₹{{ total }}</h5>
+        <button class="btn btn-dark" (click)="checkout()">Checkout</button>
+      </div>
+    </div>
+  </div>

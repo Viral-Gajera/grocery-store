@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction</title>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="./bootstrap-5.3.3-dist/css/bootstrap.min.css">
+
+    <style>
+        .flex-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        .flex-container>* {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+
+<body onload="loadTransactionDetails();">
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Grocery Store</a>
+            <div class="collapse navbar-collapse"></div>
+        </div>
+    </nav>
+
+    <!-- Payment Method Section -->
+    <div class="container mt-4">
+        <h2>Select Payment Method</h2>
+    </div>
+
+    <div class="container flex-container mt-3">
+        <input type="radio" class="btn-check" name="paymentMethod" id="cashOnDelivery" checked value="COD"
+            onclick="togglePaymentDetails()">
+        <label class="btn btn-outline-dark" for="cashOnDelivery">Cash on Delivery</label>
+
+        <input type="radio" class="btn-check" name="paymentMethod" id="upi" value="UPI"
+            onclick="togglePaymentDetails()">
+        <label class="btn btn-outline-dark" for="upi">UPI</label>
+
+        <input type="radio" class="btn-check" name="paymentMethod" id="creditCard" value="Credit Card"
+            onclick="togglePaymentDetails()">
+        <label class="btn btn-outline-dark" for="creditCard">Credit Card</label>
+
+        <input type="radio" class="btn-check" name="paymentMethod" id="debitCard" value="Debit Card"
+            onclick="togglePaymentDetails()">
+        <label class="btn btn-outline-dark" for="debitCard">Debit Card</label>
+
+        <input type="radio" class="btn-check" name="paymentMethod" id="netBanking" value="Net Banking"
+            onclick="togglePaymentDetails()">
+        <label class="btn btn-outline-dark" for="netBanking">Net Banking</label>
+    </div>
+
+    <!-- Payment Details Form (Hidden Initially) -->
+    <div id="paymentDetails" class="mt-5 container" style="display: none;">
+        <h4>Enter Payment Details</h4>
+        <div id="upiSection" class="mb-2" style="display: none;">
+            <input type="text" id="upiId" class="form-control" placeholder="Enter UPI ID (Ex. example@somebank)">
+        </div>
+        <div id="cardSection" class="mb-2" style="display: none;">
+            <input type="number" id="cardNumber" class="form-control" placeholder="Card Number">
+            <input type="text" id="cardExpiry" class="form-control mt-2" placeholder="Expiry (MM/YY)">
+            <input type="number" id="cardCVV" class="form-control mt-2" placeholder="CVV">
+        </div>
+        <div id="netBankingSection" class="mb-2" style="display: none;">
+            <select id="bankName" class="form-select">
+                <option value="">Select Bank</option>
+                <option value="HDFC">HDFC Bank</option>
+                <option value="ICICI">ICICI Bank</option>
+                <option value="SBI">State Bank of India</option>
+                <option value="AXIS">Axis Bank</option>
+            </select>
+            <input type="number" id="accountNumber" class="form-control mt-2" placeholder="Account Number">
+            <input type="text" id="ifscCode" class="form-control mt-2" placeholder="IFSC Code (Ex. SBIN123456)">
+        </div>
+    </div>
+
+    <!-- Final Pricing Details -->
+    <div class="container mt-5">
+        <h4 class="mt-4 mb-2">Final Pricing Details</h4>
+        <ul class="list-group">
+            <li class="list-group-item">Total Product Price: ₹<span id="productTotal">0</span></li>
+            <li class="list-group-item">Total Discount: ₹<span id="discount">0</span> (10% Discount)</li>
+            <li class="list-group-item">GST Charges: ₹<span id="gstCharges">50</span> (18% - Before Discount) </li>
+            <li class="list-group-item">Delivery Charges: ₹<span id="deliveryCharges">50</span></li>
+            <li class="list-group-item fw-bold">Order Total: ₹<span id="orderTotal">0</span></li>
+        </ul>
+    </div>
+
+    <!-- Proceed to Buy Button -->
+    <div class="container">
+        <button class="btn btn-dark mt-3" onclick="completeTransaction()">Proceed to Buy</button>
+    </div>
+
+    <script>
+
+        function loadTransactionDetails() {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            let total = 0;
+
+            cart.forEach(item => {
+                total += item.price;
+            });
+
+            let discount = total * 0.1; // 10% discount
+            let gstCharges = total * 0.18; // GST 18%
+            let deliveryCharges = 50;
+            let orderTotal = total - discount + gstCharges + deliveryCharges;
+
+            document.getElementById("productTotal").innerText = total;
+            document.getElementById("discount").innerText = discount.toFixed(2);
+            document.getElementById("gstCharges").innerText = gstCharges.toFixed(2);
+            document.getElementById("deliveryCharges").innerText = deliveryCharges;
+            document.getElementById("orderTotal").innerText = orderTotal;
+        }
+
+        function togglePaymentDetails() {
+            let method = document.querySelector('input[name="paymentMethod"]:checked').value;
+            document.getElementById("paymentDetails").style.display = method !== "COD" ? "block" : "none";
+            document.getElementById("upiSection").style.display = method === "UPI" ? "block" : "none";
+            document.getElementById("cardSection").style.display = (method === "Credit Card" || method === "Debit Card") ? "block" : "none";
+            document.getElementById("netBankingSection").style.display = method === "Net Banking" ? "block" : "none";
+        }
+
+        function completeTransaction() {
+            let method = document.querySelector('input[name="paymentMethod"]:checked').value;
+            if (method !== "COD") {
+                let isValid = validatePaymentDetails(method);
+                if (!isValid) return;
+            }
+
+            let transactionId = "TXN" + Math.floor(Math.random() * 1000000);
+            localStorage.setItem("lastTransactionId", transactionId);
+            window.location.href = "success.html";
+        }
+
+        function validatePaymentDetails(method) {
+            if (method === "UPI") {
+                let upiId = document.getElementById("upiId").value.trim()
+                if (!upiId) {
+                    alert("Enter UPI ID");
+                    return false;
+                }
+                if (!/[A-z0-9.]+[@][A-z0-9.]+/.test(upiId)) {
+                    alert("Enter Valid UPI ID");
+                    return false;
+                }
+
+            }
+            if ((method === "Credit Card" || method === "Debit Card")) {
+                let cardNumber = document.getElementById("cardNumber").value.trim()
+                let cardExpiry = document.getElementById("cardExpiry").value.trim()
+                let cardCVV = document.getElementById("cardCVV").value.trim()
+
+                if (!cardNumber || !cardExpiry || !cardCVV) {
+                    alert("Enter complete Card details");
+                    return false;
+                }
+
+                if (!/[0-9]{15}/.test(cardNumber)) {
+                    alert("Enter 15 digit card number");
+                    return false;
+                }
+
+                if (!/\d{2}\/\d{2}/.test(cardExpiry)) {
+                    alert("Enter valid Card Expiry");
+                    return false;
+                }
+
+                if (! /^\d{3}$/.test(cardCVV)) {
+                    alert("Enter 3 digit valid Card CVV");
+                    return false;
+                }
+            }
+            if (method === "Net Banking") {
+                let bankName = document.getElementById("bankName").value;
+                let accountNumber = document.getElementById("accountNumber").value;
+                let ifscCode = document.getElementById("ifscCode").value;
+                
+                if (!bankName) {
+                    alert("Select a Bank");
+                    return false;
+                }
+
+                if (!/[0-9]{15}/.test(accountNumber)) {
+                    alert("Enter 15 digit Account number");
+                    return false;
+                }
+
+                console.log(/[A-z]{4}[A-Z0-9]{6}/.test(ifscCode), ifscCode)
+
+                if (!/[A-Z]{4}[A-Z0-9]{6}/.test(ifscCode)) {
+                    alert("Enter 10 digit IFSC Code");
+                    return false;
+                }
+
+            }
+            return true;
+        }
+    </script>
+
+</body>
+
+</html>

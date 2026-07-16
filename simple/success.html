@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Success</title>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="./bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <style>
+        @media print {
+            body {
+                visibility: hidden;
+            }
+
+            #invoice {
+                visibility: visible;
+                margin: 0px;
+                width: 100%;
+
+                position: absolute;
+                left: 0;
+                top: 0;
+
+                .card {
+                    width: 700px;
+                }
+            }
+        }
+
+        .footer {
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body onload="displayTransactionDetails();">
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Grocery Store</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Success Message -->
+    <div class="container mt-5 text-center">
+        <h2 class="text-dark">🎉 Transaction Successful! 🎉</h2>
+        <p>Your order has been placed successfully. Below is your invoice.</p>
+    </div>
+
+    <!-- Invoice Details -->
+    <div class="container mt-4" id="invoice">
+        <h3>Invoice</h3>
+        <div class="card p-3">
+            <p><strong>Transaction ID:</strong> <span id="transactionId"></span></p>
+            <p><strong>Customer ID:</strong> <span id="customerId"></span></p>
+            <p>
+                <strong>Products:</strong>
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="">
+                        <th>Product</th>
+                        <th>Price (₹)</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody id="cartTableBody"></tbody>
+            </table>
+            </p>
+
+            <!-- <li class="list-group-item">Total Product Price: ₹<span id="productTotal">0</span></li>
+            <li class="list-group-item">Total Discount: ₹<span id="discount">0</span> (10% Discount)</li>
+            <li class="list-group-item">GST Charges: ₹<span id="gstCharges">50</span> (18% - Before Discount) </li>
+            <li class="list-group-item">Delivery Charges: ₹<span id="deliveryCharges">50</span></li>
+            <li class="list-group-item fw-bold">Order Total: ₹<span id="orderTotal">0</span></li> -->
+
+            <p><strong>Total Product Price:</strong> ₹<span id="productTotal"></span></p>
+            <p><strong>Discount:</strong> ₹<span id="discount"></span> (10% Discount)</p>
+            <p><strong>GST Charges:</strong> ₹<span id="gstCharges"></span> (18% - Before Discount)</p>
+            <p><strong>Delivery Charges:</strong> ₹<span id="deliveryCharges"></span></p>
+            <p><strong>Order Total:</strong> ₹<span id="orderTotal"></span></p>
+            <p></p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Download Invoice Button -->
+        <button class="btn btn-dark mt-3" onclick="downloadInvoice()">Download Invoice</button>
+    </div>
+
+    <!-- footer -->
+    <div class="footer bg-dark mt-5">
+    </div>
+
+    <script>
+        function displayTransactionDetails() {
+            let transactionId = localStorage.getItem("lastTransactionId") || "N/A";
+            let currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+            document.getElementById("transactionId").innerText = transactionId;
+            document.getElementById("customerId").innerText = currentUser.customerId;
+
+            let cartTableBody = document.getElementById("cartTableBody");
+
+            let total = 0;
+            let cartSummary = {};
+
+            // Count product quantities
+            cart.forEach((item) => {
+                if (cartSummary[item.name]) {
+                    cartSummary[item.name].quantity += 1;
+                } else {
+                    cartSummary[item.name] = { ...item, quantity: 1 };
+                }
+            });
+
+            cartTableBody.innerHTML = "";
+            Object.values(cartSummary).forEach((item, index) => {
+                total += item.price * item.quantity;
+                cartTableBody.innerHTML += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>₹${item.price}</td>
+                        <td>
+                            <div style="width:20px; display:inline-block; text-align:center;">${item.quantity}</div>
+                        </td>
+                    </tr>`;
+            });
+
+            let discount = total * 0.1; // 10% discount
+            let gstCharges = total * 0.18; // GST 18%
+            let deliveryCharges = 50;
+            let orderTotal = total - discount + gstCharges + deliveryCharges;
+
+            document.getElementById("productTotal").innerText = total;
+            document.getElementById("discount").innerText = discount.toFixed(2);
+            document.getElementById("gstCharges").innerText = gstCharges.toFixed(2);
+            document.getElementById("deliveryCharges").innerText = deliveryCharges;
+            document.getElementById("orderTotal").innerText = orderTotal;
+
+        }
+
+        function downloadInvoice() {
+            const invoice = document.querySelector("#invoice");
+            window.print(invoice);
+        }
+
+        // Clear cart and transaction details before leaving the page
+        window.onbeforeunload = function () {
+            alert("Thank you for shopping with us!");
+            localStorage.removeItem("cart");
+            localStorage.removeItem("lastTransactionId");
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+@media print {
+    body {
+      visibility: hidden;
+    }
+  
+    #invoice {
+      visibility: visible;
+      margin: 0;
+      width: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+  
+    #invoice .card {
+      width: 700px;
+    }
+  }
+  
+  .footer {
+    height: 100px;
+  }

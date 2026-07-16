@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping Cart</title>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="./bootstrap-5.3.3-dist/css/bootstrap.min.css" />
+    <style>
+        .empty-message {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body onload="displayCart(); updateCartCount();">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Grocery Store</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html">My Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cart.html" style="color: white">
+                            Cart
+                            <span id="cartCount" class="badge bg-danger">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container empty-message mt-4" style="height: calc(100vh - 80px)" id="emptyMessage">
+        <div class="text-center">
+            <h1 class="mb-4">Your Cart is Empty</h1>
+            <button class="btn btn-dark" onclick="window.location.href='index.html#groceries-list'">
+                View Products
+            </button>
+        </div>
+    </div>
+
+    <!-- Cart Items -->
+    <!-- <div class="container mt-4" id="cartItems">
+        <div class="row">
+            <div class="col-md-4 col-12">
+                <h2>Your Cart</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="">
+                            <th>Product</th>
+                            <th>Price (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartSignleTableBody"></tbody>
+                </table>
+            </div>
+            <div class="col-md-8 col-12">
+                <h2>Summary</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="">
+                            <th>Product</th>
+                            <th>Price (₹)</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartTableBody"></tbody>
+                </table>
+                <h5 class="mt-4 mb-4">Total: ₹<span id="totalAmount">0</span></h5>
+                <button class="btn btn-dark" id="checkOutButton" onclick="checkout()">Checkout</button>
+            </div>
+        </div>
+    </div> -->
+    <div class="container mt-4" id="cartItems">
+        <div class="row">
+            <div class="col-12">
+                <h2>Summary</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="">
+                            <th>Product</th>
+                            <th>Price (₹)</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartTableBody"></tbody>
+                </table>
+                <h5 class="mt-4 mb-4">
+                    Total: ₹<span id="totalAmount">0</span>
+                </h5>
+                <button class="btn btn-dark" id="checkOutButton" onclick="checkout()">
+                    Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const checkOutButton = document.querySelector("#checkOutButton");
+        const cartItems = document.querySelector("#cartItems");
+        const emptyMessage = document.querySelector("#emptyMessage");
+
+        function logout() {
+            localStorage.removeItem("currentUser");
+            window.location.href = "login.html";
+        }
+
+        // Display Cart Items
+        // function displayCart() {
+        //     let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        //     let cartTableBody = document.getElementById("cartTableBody");
+        //     let total = 0;
+
+        //     cartTableBody.innerHTML = "";
+        //     cart.forEach((item, index) => {
+        //         total += item.price;
+        //         cartTableBody.innerHTML += `
+        //             <tr>
+        //                 <td>${item.name}</td>
+        //                 <td>₹${item.price}</td>
+        //                 <td>${item.quantity ?? 1}</td>
+        //                 <td><button class="btn btn-danger btn-sm" onclick="removeFromCart(${index})">Remove</button></td>
+        //             </tr>`;
+        //     });
+
+        //     document.getElementById("totalAmount").innerText = total;
+        // }
+        function displayCart() {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            let cartTableBody = document.getElementById("cartTableBody");
+            // let cartSignleTableBody = document.getElementById(
+            //     "cartSignleTableBody"
+            // );
+
+            let total = 0;
+            let cartSummary = {};
+
+            if (cart.length === 0) {
+                checkOutButton.disabled = true;
+                cartItems.style.display = "none";
+                emptyMessage.style.display = "flex";
+            } else {
+                checkOutButton.disabled = false;
+                cartItems.style.display = "block";
+                emptyMessage.style.display = "none";
+            }
+
+            // Count product quantities
+            cart.forEach((item) => {
+                if (cartSummary[item.id]) {
+                    cartSummary[item.id].quantity += 1;
+                } else {
+                    cartSummary[item.id] = { ...item, quantity: 1 };
+                }
+            });
+
+            cartTableBody.innerHTML = "";
+            Object.values(cartSummary).forEach((item, index) => {
+                total += item.price * item.quantity;
+                cartTableBody.innerHTML += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>₹${item.price}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="updateQuantity('${item.id}', -1)">
+                                <div style="width:17px;"><b>-</b><div>
+                            </button>
+                            <div style="width:20px; display:inline-block; text-align:center;">${item.quantity}</div>
+                            <button class="btn btn-sm btn-secondary" onclick="updateQuantity('${item.id}', 1)">
+                                <div style="width:17px;"><b>+</b><div>
+                            </button>
+                        </td>
+                        <td><button class="btn btn-danger btn-sm" onclick="removeFromCart('${item.id}')">Remove</button></td>
+                    </tr>`;
+            });
+
+            // cartSignleTableBody.innerHTML = "";
+            // Object.values(cartSummary).forEach((item, index) => {
+            //     cartSignleTableBody.innerHTML += `
+            //         <tr>
+            //             <td>${item.name}</td>
+            //             <td>
+            //                 <div style="height:31px" >₹${item.price}</div>
+            //             </td>
+            //         </tr>`;
+            // });
+
+            document.getElementById("totalAmount").innerText = total;
+            updateCartCount();
+        }
+
+        function updateQuantity(productId, change) {
+
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            let index = cart.findIndex((item) => item.id == productId);
+
+            if (index !== -1) {
+                if (change === -1) {
+                    cart.splice(index, 1);
+                } else {
+                    cart.push(cart[index]);
+                }
+            }
+
+            localStorage.setItem("cart", JSON.stringify(cart));
+            displayCart();
+        }
+
+        // Remove Item from Cart
+        function removeFromCart(id) {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            cart = cart.filter((item)=>item.id != id)
+            localStorage.setItem("cart", JSON.stringify(cart));
+            displayCart();
+            updateCartCount();
+        }
+
+        // Update Cart Count
+        function updateCartCount() {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            document.getElementById("cartCount").innerText = cart.length;
+        }
+
+        // Checkout Function
+        function checkout() {
+            // if (confirm("Proceed to checkout?")) {
+            //     alert("Order Placed Successfully!");
+            //     localStorage.removeItem("cart");
+            //     displayCart();
+            //     updateCartCount();
+            // }
+            if (confirm("Proceed to checkout?")) {
+                window.location.href = "trasaction.html";
+            }
+        }
+    </script>
+</body>
+
+</html>
